@@ -1,19 +1,14 @@
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Search } from 'lucide-react';
 import { ProductCard } from '@/components/ProductCard';
 import { CollectionCard } from '@/components/CollectionCard';
 import { FloatingCart } from '@/components/FloatingCart';
 import { NewsletterSection } from '@/components/NewsletterSection';
 import { EcommerceTemplate } from '@/templates/EcommerceTemplate';
+import { HeroSection } from '@/components/HeroSection';
+import { TrendCarousel } from '@/components/TrendCarousel';
+import { ShoppableLookbook } from '@/components/ShoppableLookbook';
+import { CategoryFilters } from '@/components/CategoryFilters';
+import { SizeGuideModal } from '@/components/SizeGuideModal';
 import type { UseIndexLogicReturn } from '@/components/headless/HeadlessIndex';
-
-/**
- * EDITABLE UI - IndexUI
- * 
- * Interfaz completamente editable para la página principal.
- * El agente IA puede modificar colores, textos, layout, etc.
- */
 
 interface IndexUIProps {
   logic: UseIndexLogicReturn;
@@ -31,30 +26,27 @@ export const IndexUI = ({ logic }: IndexUIProps) => {
   } = logic;
 
   return (
-    <EcommerceTemplate 
-      showCart={true}
-    >
+    <EcommerceTemplate showCart={true}>
       {/* Hero Section */}
-      <section className="bg-background py-12 border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl font-bold text-foreground mb-4">
-            Discover Our Products
-          </h1>
-          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Find the best products at the best price. Guaranteed quality and fast shipping.
-          </p>
-        </div>
-      </section>
+      <HeroSection />
+
+      {/* Category Filters */}
+      <CategoryFilters />
 
       {/* Collections Section */}
       {!loadingCollections && collections.length > 0 && (
-        <section className="py-12 bg-muted/30">
+        <section className="py-20 bg-muted/30">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl font-bold text-foreground mb-8">
-              Our Collections
-            </h2>
+            <div className="text-center mb-12">
+              <p className="editorial-subheading text-muted-foreground mb-3">
+                Curated Collections
+              </p>
+              <h2 className="editorial-heading text-4xl md:text-5xl text-foreground">
+                Shop by Collection
+              </h2>
+            </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {collections.map((collection) => (
                 <CollectionCard 
                   key={collection.id} 
@@ -67,47 +59,66 @@ export const IndexUI = ({ logic }: IndexUIProps) => {
         </section>
       )}
 
+      {/* Trend Carousel */}
+      <TrendCarousel />
+
       {/* Products Section */}
-      <section className="py-12">
+      <section id="products-section" className="py-20 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold text-foreground">
-              {selectedCollectionId 
-                ? `Products from ${collections.find(c => c.id === selectedCollectionId)?.name || 'Collection'}` 
-                : 'Featured Products'
-              }
-            </h2>
-            {selectedCollectionId && (
-              <Button 
-                variant="outline" 
-                onClick={handleShowAllProducts}
-              >
-                See All Products
-              </Button>
-            )}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-12 gap-4">
+            <div>
+              <p className="editorial-subheading text-muted-foreground mb-2">
+                {selectedCollectionId ? 'Collection' : 'All Products'}
+              </p>
+              <h2 className="editorial-heading text-3xl md:text-4xl text-foreground">
+                {selectedCollectionId 
+                  ? collections.find(c => c.id === selectedCollectionId)?.name || 'Collection'
+                  : 'New Arrivals'
+                }
+              </h2>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <SizeGuideModal />
+              {selectedCollectionId && (
+                <Button 
+                  variant="outline" 
+                  onClick={handleShowAllProducts}
+                >
+                  View All Products
+                </Button>
+              )}
+            </div>
           </div>
           
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="bg-muted rounded-lg h-80 animate-pulse"></div>
+                <div key={i} className="space-y-4">
+                  <div className="aspect-[3/4] bg-muted animate-pulse" />
+                  <div className="h-4 bg-muted animate-pulse w-3/4" />
+                  <div className="h-4 bg-muted animate-pulse w-1/2" />
+                </div>
               ))}
             </div>
           ) : filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {filteredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">
-                No products available.
+            <div className="text-center py-20">
+              <p className="text-muted-foreground text-lg">
+                No products available in this collection.
               </p>
             </div>
           )}
         </div>
       </section>
+
+      {/* Shoppable Lookbook */}
+      <ShoppableLookbook />
 
       {/* Newsletter Section */}
       <NewsletterSection />
